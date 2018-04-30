@@ -3,12 +3,13 @@ import { StepMap, IStep, Popover, IBranch, Branch } from './step.model';
 export class StepBuilder {
   stepMap: StepMap;
   previousStep: IStep;
-  latestBranch: Branch;
+  branches: Branch[];
   addYes: boolean;
   addNo: boolean;
 
   constructor() {
     this.stepMap = { };
+    this.branches = [];
   }
 
   nextId() {
@@ -17,10 +18,14 @@ export class StepBuilder {
 
   previousId() {
     if (this.addYes || this.addNo) {
-      return this.latestBranch.id;
+      return this.getBranch().id;
     }
 
     return this.previousStep ? this.previousStep.id : 0;
+  }
+
+  getBranch() {
+    return this.branches[this.branches.length - 1];
   }
 
   popover(name: string) {
@@ -32,9 +37,16 @@ export class StepBuilder {
   branch(name: string) {
     const step = new Branch(this.nextId(), name, null, null, this.previousId());
 
-    this.latestBranch = step;
+    this.branches.push(step);
 
     return this.addStep(step);
+  }
+
+  branchEnd() {
+    this.branches.pop();
+    this.addNo = this.addYes = false;
+
+    return this;
   }
 
   yes() {
@@ -53,9 +65,9 @@ export class StepBuilder {
     this.stepMap[step.id] = step;
 
     if (this.addYes) {
-      this.latestBranch.yes = step.id;
+      this.getBranch().yes = step.id;
     } else if (this.addNo) {
-      this.latestBranch.no = step.id;
+      this.getBranch().no = step.id;
     } else if (this.previousStep) {
       this.previousStep.next = step.id;
     }

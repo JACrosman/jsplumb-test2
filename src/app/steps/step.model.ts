@@ -15,6 +15,7 @@ export interface IPopover extends IStep {
 export interface IBranch extends IStep {
   yes: number;
   no: number;
+  converge: number;
 }
 
 export class Popover implements IPopover {
@@ -35,6 +36,7 @@ export class Popover implements IPopover {
 export class Branch implements IBranch {
   type: string;
   next: number;
+  converge: number;
 
   constructor(
     public id: number,
